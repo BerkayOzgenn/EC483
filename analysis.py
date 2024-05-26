@@ -52,6 +52,10 @@ for Year in ['22', '23']:
         Dataset['Scaled Household Income Without Transfers'] = Dataset['Household Income Without Transfers'] / Dataset['Family EFB']
         Dataset['Scaled Transfers'] = Dataset['Transfers'] / Dataset['Family EFB']
 
+# These are obvious and harmful outliers in the dataset, and they are removed for further analysis.
+SILCAll['22'].drop(SILCAll['22'][SILCAll['22']['Family'].isin([9292, 9289])].index, inplace=True)
+SILCHousehold['22'].drop(SILCHousehold['22'][SILCHousehold['22']['Family'].isin([9292, 9289])].index, inplace=True)
+
 # Classifying individuals by their genders for further analysis.
 SILCMen = {}
 SILCWomen = {}
@@ -100,3 +104,8 @@ RegionAllGINI22 = pd.DataFrame({Region: CalculateGINI(SILCHousehold['22'].loc[SI
 RegionAllGINI23 = pd.DataFrame({Region: CalculateGINI(SILCHousehold['23'].loc[SILCHousehold['23']['Region'] == Region]['Scaled Household Income']) for Region in Regions}, index=[0]).transpose().rename(columns={0: 'GINI Coefficient - 2023'}).sort_values(by='GINI Coefficient - 2023')
 
 RegionGINI = pd.concat([RegionWomenGINI22, RegionMenGINI22, RegionWomenGINI23, RegionMenGINI23, RegionAllGINI22, RegionAllGINI23], axis=1).sort_values(by='GINI Coefficient - 2023')
+
+# Exporting the datasets to CSV files for later use in mapping.
+RegionGINI.to_csv('RegionGINI.csv')
+RegionData['22'].to_csv('RegionIncomeStatistics22.csv', index=False)
+RegionData['23'].to_csv('RegionIncomeStatistics23.csv', index=False)
